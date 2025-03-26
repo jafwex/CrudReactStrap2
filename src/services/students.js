@@ -1,18 +1,20 @@
 import axiosClient from "../config/axiosClient";
 
-
-export const fetchAllStudents = async () => {
-  return await axiosClient.get("/students");
+export const getStudents = async () => {
+  const response = await axiosClient.get("/students");
+  return response.data;
 };
 
 export const addStudent = async (student) => {
-  return await axiosClient.post("/students", student);
+  const response = await axiosClient.post("/students", student);
+  return response.data;
 };
 
 export const updateStudent = async (id, student) => {
-  return await axiosClient.put(`/students/${id}`, student);
+  const response = await axiosClient.put(`/students/${id}`, student);
+  return response.data;
 };
 
 export const deleteStudent = async (id) => {
-  return await axiosClient.delete(`/students/${id}`);
+  await axiosClient.delete(`/students/${id}`);
 };

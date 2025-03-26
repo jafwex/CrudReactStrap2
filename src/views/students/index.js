@@ -1,27 +1,20 @@
-import React, { useState } from "react";
-import { Container, Button } from "reactstrap";
-import StudentTable from "./StudentTable";  
-import StudentForm from "./StudentForm";  
+import { useState } from "react";
+import StudentTable from "./StudentTable";
+import StudentForm from "./StudentForm";
+import { Button, Container } from "reactstrap";
 
 const Students = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [modal, setModal] = useState(false);
+  const [editStudent, setEditStudent] = useState(null);
 
-  const toggleModal = () => {
-    setIsOpen(!isOpen);
-    if (!isOpen) setSelectedStudent(null); 
-  };
-
-  const handleEdit = (student) => {
-    setSelectedStudent(student); 
-    setIsOpen(true);
-  };
+  const toggleModal = () => setModal(!modal);
 
   return (
-    <Container className="mt-4">
-      <Button color="primary" onClick={toggleModal}>Add Student</Button>
-      <StudentTable onEdit={handleEdit} />
-      <StudentForm isOpen={isOpen} toggle={toggleModal} selectedStudent={selectedStudent} />
+    <Container>
+      <h1>Students</h1>
+      <Button color="primary" onClick={() => { setEditStudent(null); toggleModal(); }}>Add Student</Button>
+      <StudentTable onEdit={(student) => { setEditStudent(student); toggleModal(); }} />
+      <StudentForm isOpen={modal} toggle={toggleModal} editStudent={editStudent} />
     </Container>
   );
 };

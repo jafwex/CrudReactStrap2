@@ -1,31 +1,31 @@
-import { createContext, useState, useEffect, useCallback } from "react";
-import { fetchAllStudents, addStudent, updateStudent, deleteStudent } from "../services/students";
+import { createContext, useState, useEffect } from "react";
+import { getStudents, addStudent, updateStudent, deleteStudent } from "../services/students";
 
 export const StudentContext = createContext();
 
 export const StudentProvider = ({ children }) => {
   const [students, setStudents] = useState([]);
 
-  const fetchStudents = useCallback(async () => {
+  const fetchStudents = async () => {
     try {
-      const response = await fetchAllStudents();
-      setStudents(response.data);
+      const data = await getStudents();
+      setStudents(data);
     } catch (error) {
       console.error("Error fetching students:", error);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchStudents();
-  }, [fetchStudents]);
+  }, []);
 
-  const handleAddStudent = async (newStudent) => {
-    await addStudent(newStudent);
+  const handleAddStudent = async (student) => {
+    await addStudent(student);
     fetchStudents();
   };
 
-  const handleUpdateStudent = async (id, updatedStudent) => {
-    await updateStudent(id, updatedStudent);
+  const handleUpdateStudent = async (id, student) => {
+    await updateStudent(id, student);
     fetchStudents();
   };
 

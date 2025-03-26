@@ -1,62 +1,51 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, FormGroup, Label, Input } from "reactstrap";
+import { useState, useEffect, useContext } from "react";
 import { StudentContext } from "../../context/StudentContext";
-import { addStudent, updateStudent } from "../../services/students";
+import { Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody } from "reactstrap";
 
-const StudentForm = ({ isOpen, toggle, selectedStudent }) => {
-  const { fetchStudents } = useContext(StudentContext);
+const StudentForm = ({ isOpen, toggle, editStudent }) => {
+  const { handleAddStudent, handleUpdateStudent } = useContext(StudentContext);
   const [formData, setFormData] = useState({ name: "", mobile: "", present: false });
 
   useEffect(() => {
-    if (selectedStudent) {
-      setFormData(selectedStudent);
+    if (editStudent) {
+      setFormData(editStudent);
     } else {
       setFormData({ name: "", mobile: "", present: false });
     }
-  }, [selectedStudent]);
+  }, [editStudent]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (formData.id) {
-      await updateStudent(formData.id, formData);
+    if (editStudent) {
+      handleUpdateStudent(editStudent.id, formData);
     } else {
-      await addStudent(formData);
+      handleAddStudent(formData);
     }
-
-    await fetchStudents();  
     toggle();
   };
 
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
-      <ModalHeader toggle={toggle}>{formData.id ? "Edit Student" : "Add Student"}</ModalHeader>
+      <ModalHeader toggle={toggle}>{editStudent ? "Edit Student" : "Add Student"}</ModalHeader>
       <ModalBody>
         <Form onSubmit={handleSubmit}>
           <FormGroup>
             <Label>Name</Label>
-            <Input type="text" name="name" value={formData.name} onChange={handleChange} required />
+            <Input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
           </FormGroup>
           <FormGroup>
-            <Label>Mobile Number</Label>
-            <Input type="text" name="mobile" value={formData.mobile} onChange={handleChange} required />
+            <Label>Mobile</Label>
+            <Input type="text" value={formData.mobile} onChange={(e) => setFormData({ ...formData, mobile: e.target.value })} required />
           </FormGroup>
           <FormGroup check>
             <Label check>
-              <Input type="checkbox" name="present" checked={formData.present} onChange={handleChange} /> Present
+              <Input type="checkbox" checked={formData.present} onChange={(e) => setFormData({ ...formData, present: e.target.checked })} />
+              Present
             </Label>
           </FormGroup>
+          <Button color="primary" type="submit">{editStudent ? "Update" : "Add"}</Button>
         </Form>
       </ModalBody>
-      <ModalFooter>
-        <Button color="primary" onClick={handleSubmit}>{formData.id ? "Update" : "Add"}</Button>
-        <Button color="secondary" onClick={toggle}>Cancel</Button>
-      </ModalFooter>
     </Modal>
   );
 };
