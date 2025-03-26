@@ -7,21 +7,32 @@ const StudentForm = ({ isOpen, toggle, editStudent }) => {
   const [formData, setFormData] = useState({ name: "", mobile: "", present: false });
 
   useEffect(() => {
-    if (editStudent) {
-      setFormData(editStudent);
-    } else {
-      setFormData({ name: "", mobile: "", present: false });
-    }
+    setFormData({
+      name: editStudent?.name || "",
+      mobile: editStudent?.mobile || "",
+      present: editStudent?.present || false
+    });
   }, [editStudent]);
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editStudent) {
-      handleUpdateStudent(editStudent.id, formData);
-    } else {
-      handleAddStudent(formData);
+    try {
+      if (editStudent) {
+        await handleUpdateStudent(editStudent.id, formData);
+      } else {
+        await handleAddStudent(formData);
+      }
+    } finally {
+      toggle();
     }
-    toggle();
   };
 
   return (
@@ -31,19 +42,21 @@ const StudentForm = ({ isOpen, toggle, editStudent }) => {
         <Form onSubmit={handleSubmit}>
           <FormGroup>
             <Label>Name</Label>
-            <Input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+            <Input type="text" name="name" value={formData.name} onChange={handleChange} required />
           </FormGroup>
           <FormGroup>
             <Label>Mobile</Label>
-            <Input type="text" value={formData.mobile} onChange={(e) => setFormData({ ...formData, mobile: e.target.value })} required />
+            <Input type="text" name="mobile" value={formData.mobile} onChange={handleChange} required />
           </FormGroup>
           <FormGroup check>
             <Label check>
-              <Input type="checkbox" checked={formData.present} onChange={(e) => setFormData({ ...formData, present: e.target.checked })} />
+              <Input type="checkbox" name="present" checked={formData.present} onChange={handleChange} />
               Present
             </Label>
           </FormGroup>
-          <Button color="primary" type="submit">{editStudent ? "Update" : "Add"}</Button>
+          <Button color="primary" type="submit" disabled={!formData.name || !formData.mobile}>
+            {editStudent ? "Update" : "Add"}
+          </Button>
         </Form>
       </ModalBody>
     </Modal>
